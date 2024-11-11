@@ -1,0 +1,6 @@
+@CCL.CRMEnvioSMS_HostAddress = http://localhost:5200
+
+GET {{CCL.CRMEnvioSMS_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

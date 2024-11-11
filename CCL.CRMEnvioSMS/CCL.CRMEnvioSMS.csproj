@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CCL.CRMEnvioSMS.Core\CCL.CRMEnvioSMS.Core.csproj" />
+    <ProjectReference Include="..\CCL.CRMEnvioSMS.Data\CCL.CRMEnvioSMS.Data.csproj" />
+  </ItemGroup>
+
+</Project>
