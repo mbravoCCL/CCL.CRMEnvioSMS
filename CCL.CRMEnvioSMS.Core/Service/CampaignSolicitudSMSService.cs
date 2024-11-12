@@ -34,7 +34,83 @@ namespace CCL.CRMEnvioSMS.Core.Service
             _campaignSolicitudSMSRepository = campaignSolicitudSMSRepository;
         }
 
-        public async Task<DetalleEnvioSMSResponse> detalleEnvioSMS(Guid solicitudId)
+        public async Task<DetalleEnvioSMSResponse> detalleEnvioSMSService(Guid solicitudId)
+        {
+            var solicitudMasivo = await _solicitudSMSMasivoRepository.Obtener(solicitudId);
+            var idEvento = solicitudMasivo.new_evento;
+            var evento = await _eventoRepository.Obtener(idEvento);
+
+            if (solicitudMasivo.new_estado != Constantes.EstadoSolicitudSMSMasivo.ENVIADO)
+            {
+                return new DetalleEnvioSMSResponse
+                {
+                    estadoSolicitud = Constantes.EstadoSolicitudSMSMasivo.GetEstadoText(solicitudMasivo.new_estado),
+                    evento = evento.new_name,
+                    solicitud = solicitudMasivo.new_name,
+                    destinatarios = new List<Destinatarios>()
+                };
+            }
+
+            var campaing = await _campaignSolicitudSMSRepository.ListarIdsPorSolicitud(solicitudId);
+
+            var reportCampaingResponses = new List<ReportCampaingResponse>();
+            var fichaInscripcion = await _fichaInscripcionRepository.FichaInscripcion(idEvento);
+
+            //POR SERVICO DE ENVIA MAS
+            foreach (var itemCampaing in campaing)
+            {
+                try
+                {
+                   
+                    var reportCampaing = await _smsService.ReportCampaign(itemCampaing);
+                    if (reportCampaing?.data?.sends?.Any() == true)
+                    {
+                        reportCampaingResponses.Add(reportCampaing);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    continue;
+                }
+            }
+
+            var destinatarios = new List<Destinatarios>();
+            foreach (var reportCampaing in reportCampaingResponses)
+            {
+                foreach (var send in reportCampaing.data.sends)
+                {
+                    var ficha = fichaInscripcion.FirstOrDefault(f =>
+                        f.new_TelefonoParticular == send.phone ||
+                        f.new_TelefonoLaboral == send.phone ||
+                        f.new_contactonextelrpm == send.phone ||
+                        f.new_CTelefono04 == send.phone);
+
+
+                        var destinatario = new Destinatarios
+                        {
+                            nombreCompleto = ficha?.fullname ?? "No especificado.",
+                            telefono = send.phone,
+                            status = ConvertirStatusAEspanol(send.status),
+                            enviado = send.send_at,
+                            carrier = send.carrier,
+                            sms = send.text
+                        };
+
+                        destinatarios.Add(destinatario);
+
+                }
+            }
+
+            return new DetalleEnvioSMSResponse
+            {
+                estadoSolicitud = Constantes.EstadoSolicitudSMSMasivo.GetEstadoText(solicitudMasivo.new_estado),
+                evento = evento.new_name,
+                solicitud = solicitudMasivo.new_name,
+                destinatarios = destinatarios.OrderByDescending(d => d.status).ToList()
+            };
+        }
+
+        public async Task<DetalleEnvioSMSResponse> detalleEnvioSMSBD(Guid solicitudId)
         {
             var solicitudMasivo = await _solicitudSMSMasivoRepository.Obtener(solicitudId);
             var idEvento = solicitudMasivo.new_evento;
@@ -55,31 +131,19 @@ namespace CCL.CRMEnvioSMS.Core.Service
 
             var campaing = await _campaignSolicitudSMSRepository.ListarIdsPorSolicitud(solicitudId);
 
-            var reportCampaingResponses = new List<ReportCampaingResponse>();
             var fichaInscripcion = await _fichaInscripcionRepository.FichaInscripcion(idEvento);
 
-            foreach (var itemCampaing in campaing)
+            //POR BASE DE DATOS
+            var dataSend = new List<Send>();
+            if (campaing != null && campaing.Any())
             {
-                try
-                {
-                    var reportCampaing = await _smsService.ReportCampaign(itemCampaing);
-                    if (reportCampaing?.data?.sends?.Any() == true)
-                    {
-                        reportCampaingResponses.Add(reportCampaing);
-                    }
-
-                }
-                catch (Exception ex)
-                {
-                    continue;
-                }
+                string campaignIds = string.Join(",", campaing);
+                dataSend = await _campaignSolicitudSMSRepository.ListarCampaingSolicitudDetalle(campaignIds);
             }
 
-
             var destinatarios = new List<Destinatarios>();
-            foreach (var reportCampaing in reportCampaingResponses)
-            {
-                foreach (var send in reportCampaing.data.sends)
+
+           foreach (var send in dataSend)
                 {
                     var ficha = fichaInscripcion.FirstOrDefault(f =>
                         f.new_TelefonoParticular == send.phone ||
@@ -88,30 +152,29 @@ namespace CCL.CRMEnvioSMS.Core.Service
                         f.new_CTelefono04 == send.phone);
 
 
-                        var destinatario = new Destinatarios
-                        {
-                            nombreCompleto = ficha?.fullname ?? "Nro adicional incluido en la solicitud de Envio SMS.",
-                            telefono = send.phone,
-                            status = ConvertirStatusAEspanol(send.status),
-                            enviado = send.send_at,
-                            carrier = send.carrier,
-                            sms = send.text
-                        };
+                    var destinatario = new Destinatarios
+                    {
+                        nombreCompleto = ficha?.fullname ?? "No especificado.",
+                        telefono = send.phone,
+                        status = ConvertirStatusAEspanol(send.status),
+                        enviado = send.send_at,
+                        carrier = send.carrier,
+                        sms = send.text
+                    };
 
-                        destinatarios.Add(destinatario);
+                    destinatarios.Add(destinatario);
 
-                }
             }
+            
 
             return new DetalleEnvioSMSResponse
             {
                 estadoSolicitud = Constantes.EstadoSolicitudSMSMasivo.GetEstadoText(solicitudMasivo.new_estado),
                 evento = evento.new_name,
                 solicitud = solicitudMasivo.new_name,
-                destinatarios = destinatarios
+                destinatarios = destinatarios.OrderByDescending(d => d.status).ToList()
             };
         }
-
 
         public static string ConvertirStatusAEspanol(string status)
         {

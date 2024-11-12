@@ -17,7 +17,7 @@ namespace CCL.CRMEnvioSMS.Controllers
 
 
         [HttpGet]
-        [Route("smsMasivo/envio/{idSolicitud}")]
+        [Route("envio/{idSolicitud}")]
         public async Task<IActionResult> smsMasivo(Guid idSolicitud)
         {
             try

@@ -47,6 +47,7 @@ namespace CCL.CRMEnvioSMS.Core.Service
 
         public async Task<SmsMasivoResponse> smsMasivo(Guid idSolicitud)
         {
+            await Task.Delay(3000);
             var solicitudMasivo = await _solicitudSMSMasivoRepository.Obtener(idSolicitud);
             var evento = await _eventoRepository.Obtener(solicitudMasivo.new_evento);
             var fechaActual = DateTime.Now.Date;

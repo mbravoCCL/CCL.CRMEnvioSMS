@@ -20,7 +20,7 @@ namespace CCL.CRMEnvioSMS.Entity.Models.Response
 
     public class Send
     {
-        public string messageId { get; set; }
+        public string message_id { get; set; }
         public string phone { get; set; }
         public string text { get; set; }
         public string send_at { get; set; }

@@ -9,6 +9,7 @@ namespace CCL.CRMEnvioSMS.Core.Interface
 {
     public interface ICampaignSolicitudSMSService
     {
-        Task<DetalleEnvioSMSResponse> detalleEnvioSMS(Guid solicitudId);
+        Task<DetalleEnvioSMSResponse> detalleEnvioSMSService(Guid solicitudId);
+        Task<DetalleEnvioSMSResponse> detalleEnvioSMSBD(Guid solicitudId);
     }
 }

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Dapper;
+using CCL.CRMEnvioSMS.Entity.Models.Response;
 
 namespace CCL.CRMEnvioSMS.Data.Repository
 {
@@ -60,6 +61,27 @@ namespace CCL.CRMEnvioSMS.Data.Repository
                 catch (Exception ex)
                 {
                     throw new Exception("Error sp_ListarCampaignIdPorSolicitud", ex);
+                }
+            }
+        }
+
+        public async Task<List<Send>> ListarCampaingSolicitudDetalle(string campaign_ids)
+        {
+            using (var connection = new SqlConnection(conexionSQL))
+            {
+                await connection.OpenAsync();
+                try
+                {
+                    var response = await connection.QueryAsync<Send>(
+                        "dbo.ListarCampaingSolicitudSMSDetalleByCampaignId",
+                        new { CampaignIds = campaign_ids },
+                        commandType: CommandType.StoredProcedure);
+
+                    return response?.ToList() ?? new List<Send>(); ;
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("Error ListarCampaingSolicitudSMSDetalleByCampaignId", ex);
                 }
             }
         }

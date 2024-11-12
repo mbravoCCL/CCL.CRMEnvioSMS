@@ -15,7 +15,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-/*builder.Services.AddCors(options =>
+builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
         builder =>
@@ -24,7 +24,7 @@ builder.Services.AddSwaggerGen();
                    .AllowAnyMethod() 
                    .AllowAnyHeader();
         });
-});*/
+});
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<Settings>();
 
@@ -53,7 +53,7 @@ if (app.Environment.IsProduction() || app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-/*app.UseCors("AllowAll");*/
+app.UseCors("AllowAll");
 
 app.UseAuthorization();
 

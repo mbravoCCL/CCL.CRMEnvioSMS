@@ -19,7 +19,7 @@ namespace CCL.CRMEnvioSMS.Controllers
         [Route("detalle/{idSolicitud}")]
         public async Task<DetalleEnvioSMSResponse> detalleEnvioSMS(Guid idSolicitud)
         {
-            return await _service.detalleEnvioSMS(idSolicitud);
+            return await _service.detalleEnvioSMSService(idSolicitud);
         }
     }
 }
