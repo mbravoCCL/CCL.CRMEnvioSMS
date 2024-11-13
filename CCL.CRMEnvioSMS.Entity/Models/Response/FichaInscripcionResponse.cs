@@ -13,5 +13,6 @@ namespace CCL.CRMEnvioSMS.Entity.Models.Response
         public string? new_contactonextelrpm { get; set; }
         public string? new_CTelefono04 { get; set; }
         public string? fullname { get; set; }
+        public string? empresa { get; set; }
     }
 }

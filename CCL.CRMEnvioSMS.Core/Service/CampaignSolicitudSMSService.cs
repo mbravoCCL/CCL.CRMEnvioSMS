@@ -47,6 +47,8 @@ namespace CCL.CRMEnvioSMS.Core.Service
                     estadoSolicitud = Constantes.EstadoSolicitudSMSMasivo.GetEstadoText(solicitudMasivo.new_estado),
                     evento = evento.new_name,
                     solicitud = solicitudMasivo.new_name,
+                    fechaInicio = evento.new_HorarioInicio.AddHours(-5),
+                    fechaFin = evento.new_HorarioFin.AddHours(-5),
                     destinatarios = new List<Destinatarios>()
                 };
             }
@@ -86,9 +88,10 @@ namespace CCL.CRMEnvioSMS.Core.Service
                         f.new_CTelefono04 == send.phone);
 
 
-                        var destinatario = new Destinatarios
-                        {
-                            nombreCompleto = ficha?.fullname ?? "No especificado.",
+                    var destinatario = new Destinatarios
+                    {
+                            nombreCompleto = ficha?.fullname?.Trim() ?? "No especificado.",
+                            empresa = ficha?.empresa?.Trim() ?? "",
                             telefono = send.phone,
                             status = ConvertirStatusAEspanol(send.status),
                             enviado = send.send_at,
@@ -106,6 +109,8 @@ namespace CCL.CRMEnvioSMS.Core.Service
                 estadoSolicitud = Constantes.EstadoSolicitudSMSMasivo.GetEstadoText(solicitudMasivo.new_estado),
                 evento = evento.new_name,
                 solicitud = solicitudMasivo.new_name,
+                fechaInicio = evento.new_HorarioInicio.AddHours(-5),
+                fechaFin = evento.new_HorarioFin.AddHours(-5),
                 destinatarios = destinatarios.OrderByDescending(d => d.status).ToList()
             };
         }

@@ -10,6 +10,8 @@ namespace CCL.CRMEnvioSMS.Entity.Models.Response
     {
         public string evento { get; set; }
         public string solicitud { get; set; }
+        public DateTime fechaInicio { get; set; }
+        public DateTime fechaFin { get; set; }
         public string estadoSolicitud { get; set; }
         public List<Destinatarios> destinatarios {get;set;}
         
@@ -18,6 +20,7 @@ namespace CCL.CRMEnvioSMS.Entity.Models.Response
     public class Destinatarios
     {
         public string? nombreCompleto { get; set; }
+        public string? empresa { get; set; }
         public string? telefono { get; set; }
         public string? status { get; set; }
         public string? enviado { get; set; }

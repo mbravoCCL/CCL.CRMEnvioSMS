@@ -11,5 +11,6 @@ namespace CCL.CRMEnvioSMS.Entity.Models.Response
         public Guid new_eventoId { get; set; }
         public string new_name { get; set; }
         public DateTime new_HorarioFin { get; set; }
+        public DateTime new_HorarioInicio { get; set; }
     }
 }
